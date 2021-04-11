@@ -1,0 +1,35 @@
+name: .NET Backend
+
+on:
+  push:
+    branches:
+    - main
+    - develop
+  pull_request:
+    branches:
+    - main
+    - develop
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Clear local NuGet cache
+      run: dotnet nuget locals all --clear
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: BROwser-API
+    - name: Build
+      run: dotnet build --configuration Release BROwser-API/BROwser-API.sln
+      
