@@ -65,7 +65,7 @@ namespace BROwser_API.Controllers
         /// <param name="id">Id of the selected event to delete</param>
         /// <returns>Response handler result</returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteActivity(Guid id)
+        public async Task<IActionResult> DeleteWokroutEvent(Guid id)
         {
             return HandleResult(await Mediator.Send(new EventDelete.Command { WorkoutEvent_Id = id }));
         }
