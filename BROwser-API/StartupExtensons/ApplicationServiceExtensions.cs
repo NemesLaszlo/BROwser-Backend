@@ -1,4 +1,7 @@
-﻿using Database;
+﻿using Application.Mapping;
+using Application.WorkoutEvents;
+using Database;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +29,10 @@ namespace BROwser_API.StartupExtensons
         {
             // Database connection
             services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+            // Services
+            services.AddMediatR(typeof(EventList.Handler).Assembly);
+            services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
             services.AddSwaggerGen(c =>
             {

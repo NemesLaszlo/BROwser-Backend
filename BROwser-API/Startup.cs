@@ -1,5 +1,8 @@
+using Application.WorkoutEvents;
+using BROwser_API.Middlewares;
 using BROwser_API.StartupExtensons;
 using Database;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,9 +32,12 @@ namespace BROwser_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationServices(Configuration); // Appliucation services extended settings
+            services.AddApplicationServices(Configuration); // Application Services extended settings
             services.AddIndentityServices(Configuration); // Application Indentity extended settings
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation(config =>
+            {
+                config.RegisterValidatorsFromAssemblyContaining<EventCreation>();
+            });
 
         }
 
@@ -44,6 +50,8 @@ namespace BROwser_API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BROwser_API v1"));
             }
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 

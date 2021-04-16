@@ -29,6 +29,7 @@ namespace BROwser_API
                 // Database Entity automatization, when the application starts
                 var context = services.GetRequiredService<DataContext>();
                 await context.Database.MigrateAsync();
+                await TestDataSeeder.SeedData(context);
             }
             catch (Exception ex)
             {
