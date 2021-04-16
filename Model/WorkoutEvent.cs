@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Model
 {
+    /// <summary>
+    /// Workout event configuration - this is the main point/entity of the application
+    /// </summary>
     public class WorkoutEvent
     {
         [Key]

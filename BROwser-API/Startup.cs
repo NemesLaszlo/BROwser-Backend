@@ -29,8 +29,8 @@ namespace BROwser_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationServices(Configuration);
-            services.AddIndentityServices(Configuration);
+            services.AddApplicationServices(Configuration); // Appliucation services extended settings
+            services.AddIndentityServices(Configuration); // Application Indentity extended settings
             services.AddControllers();
 
         }

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Model
 {
+    /// <summary>
+    /// Application user class with the Indentitiy user options, extends with Bio and Displayname
+    /// </summary>
     public class AppUser : IdentityUser
     {
         public string DisplayName { get; set; }
