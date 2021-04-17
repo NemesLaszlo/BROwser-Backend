@@ -1,4 +1,7 @@
-﻿using Database;
+﻿using Application.Mapping;
+using Application.WorkoutEvents;
+using Database;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,11 +13,26 @@ using System.Threading.Tasks;
 
 namespace BROwser_API.StartupExtensons
 {
+    /// <summary>
+    /// Static class which contains the static method to handle the application service configurations
+    /// like database connections and service scope definitions
+    /// </summary>
     public static class ApplicationServiceExtensions
     {
+        /// <summary>
+        /// Handling the database connections and other services and service scopes and configurations
+        /// </summary>
+        /// <param name="services">IServiceCollection</param>
+        /// <param name="configuration">IConfiguration</param>
+        /// <returns>Services</returns>
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
+            // Database connection
             services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+            // Services
+            services.AddMediatR(typeof(EventList.Handler).Assembly);
+            services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
             services.AddSwaggerGen(c =>
             {
