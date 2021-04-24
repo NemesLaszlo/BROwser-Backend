@@ -1,5 +1,7 @@
 ﻿using Application.Mapping;
 using Application.WorkoutEvents;
+using BROwser_API.Interfaces;
+using BROwser_API.Services;
 using Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +35,8 @@ namespace BROwser_API.StartupExtensons
             // Services
             services.AddMediatR(typeof(EventList.Handler).Assembly);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
+            services.AddScoped<ITokenService, TokenService>();
 
             services.AddSwaggerGen(c =>
             {

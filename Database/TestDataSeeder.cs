@@ -1,4 +1,5 @@
-﻿using Model;
+﻿using Microsoft.AspNetCore.Identity;
+using Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,75 @@ namespace Database
 {
     public class TestDataSeeder
     {
-        public static async Task SeedData(DataContext context)
+        public static async Task SeedData(DataContext context, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
         {
-            if (context.WorkoutEvents.Any()) return;
+            if (userManager.Users.Any() && context.WorkoutEvents.Any()) return;
+
+            var roles = new List<AppRole>
+            {
+                new AppRole{Name = "Member"},
+                new AppRole{Name = "Admin"},
+                new AppRole{Name = "Moderator"},
+            };
+
+            foreach (var role in roles)
+            {
+                await roleManager.CreateAsync(role);
+            }
+
+            var users = new List<AppUser>
+                {
+                    new AppUser
+                    {
+                        DisplayName = "Laci",
+                        UserName = "Laszlo",
+                        DateOfBirth = new DateTime(1996, 4, 20),
+                        Email = "laszlo@browser.com"
+                    },
+                    new AppUser
+                    {
+                        DisplayName = "Attila",
+                        UserName = "Attila",
+                        DateOfBirth = new DateTime(1996, 4, 20),
+                        Email = "attila@browser.com"
+                    },
+                    new AppUser
+                    {
+                        DisplayName = "Krisz",
+                        UserName = "Krisztian",
+                        DateOfBirth = new DateTime(1996, 4, 20),
+                        Email = "krisztian@browser.com"
+                    },
+                    new AppUser
+                    {
+                        DisplayName = "Karesz",
+                        UserName = "Karoly",
+                        DateOfBirth = new DateTime(1996, 4, 20),
+                        Email = "karoly@browser.com"
+                    },
+                    new AppUser
+                    {
+                        DisplayName = "Adam",
+                        UserName = "Adam",
+                        DateOfBirth = new DateTime(1996, 4, 20),
+                        Email = "adam@browser.com"
+                    },
+            };
+
+            foreach (var user in users)
+            {
+                await userManager.CreateAsync(user, "Pa$$w0rd");
+                await userManager.AddToRoleAsync(user, "Member");
+            }
+
+            var admin = new AppUser
+            {
+                DisplayName = "Admin",
+                UserName = "admin",
+                Email = "admin@browser.com"
+            };
+            await userManager.CreateAsync(admin, "Pa$$w0rd");
+            await userManager.AddToRolesAsync(admin, new[] { "Admin", "Moderator" });
 
             var workoutEvents = new List<WorkoutEvent>
             {

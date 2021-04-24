@@ -1,11 +1,14 @@
 ﻿using Database;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BROwser_API.StartupExtensons
@@ -30,10 +33,36 @@ namespace BROwser_API.StartupExtensons
             {
                 options.Password.RequireNonAlphanumeric = false;
             })
-            .AddEntityFrameworkStores<DataContext>()
-            .AddSignInManager<SignInManager<AppUser>>();
+             .AddRoles<AppRole>()
+             .AddRoleManager<RoleManager<AppRole>>()
+             .AddSignInManager<SignInManager<AppUser>>()
+             .AddRoleValidator<RoleValidator<AppRole>>()
+             .AddEntityFrameworkStores<DataContext>()
+             .AddDefaultTokenProviders();
 
-            services.AddAuthentication();
+            // Token configuration
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value));
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt =>
+                {
+                    opt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = key,
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
+            // Role configuration
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin")); // Admin only
+                opt.AddPolicy("RequireModeratorRole", policy => policy.RequireRole("Admin", "Moderator")); // Admin or Moderator
+            });
 
             return services;
         }

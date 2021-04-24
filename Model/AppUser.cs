@@ -10,9 +10,13 @@ namespace Model
     /// <summary>
     /// Application user class with the Indentitiy user options, extends with Bio and Displayname
     /// </summary>
-    public class AppUser : IdentityUser
+    public class AppUser : IdentityUser<Guid>
     {
+        public DateTime DateOfBirth { get; set; }
         public string DisplayName { get; set; }
         public string Bio { get; set; }
+        public ICollection<Photo> Photos { get; set; }
+        public ICollection<AppUserRole> UserRoles { get; set; }
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }
