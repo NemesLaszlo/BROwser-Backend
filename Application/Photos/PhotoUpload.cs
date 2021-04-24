@@ -46,6 +46,7 @@ namespace Application.Photos
             // Upload the photo
             public async Task<Result<Photo>> Handle(Command request, CancellationToken cancellationToken)
             {
+                // Current logged in user by email
                 var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Email == _userAccessor.GetEmail());
                 if (user == null) return null;
 
