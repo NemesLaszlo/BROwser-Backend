@@ -28,8 +28,10 @@ namespace BROwser_API
             {
                 // Database Entity automatization, when the application starts
                 var context = services.GetRequiredService<DataContext>();
+                var userManager = services.GetRequiredService<UserManager<AppUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
                 await context.Database.MigrateAsync();
-                await TestDataSeeder.SeedData(context);
+                await TestDataSeeder.SeedData(context, userManager, roleManager);
             }
             catch (Exception ex)
             {
