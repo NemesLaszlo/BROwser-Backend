@@ -1,4 +1,6 @@
-﻿using Application.Mapping;
+﻿using Application.Interfaces;
+using Application.Mapping;
+using Application.Photos;
 using Application.WorkoutEvents;
 using BROwser_API.Interfaces;
 using BROwser_API.Services;
@@ -37,6 +39,7 @@ namespace BROwser_API.StartupExtensons
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
 
             services.AddSwaggerGen(c =>
             {
