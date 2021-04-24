@@ -1,5 +1,7 @@
 ﻿using Application.Core;
 using Application.Interfaces;
+using Application.Photos.DTOs;
+using AutoMapper;
 using Database;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +24,7 @@ namespace Application.Photos
         /// <summary>
         /// File seletion to upload
         /// </summary>
-        public class Command : IRequest<Result<Photo>>
+        public class Command : IRequest<Result<PhotoDTO>>
         {
             public IFormFile File { get; set; }
         }
@@ -30,21 +32,23 @@ namespace Application.Photos
         /// <summary>
         /// Photo upload - business operation handler
         /// </summary>
-        public class Handler : IRequestHandler<Command, Result<Photo>>
+        public class Handler : IRequestHandler<Command, Result<PhotoDTO>>
         {
             private readonly DataContext _context;
             private readonly IPhotoAccessor _photoAccessor;
             private readonly IUserAccessor _userAccessor;
+            private readonly IMapper _mapper;
 
-            public Handler(DataContext context, IPhotoAccessor photoAccessor, IUserAccessor userAccessor)
+            public Handler(DataContext context, IPhotoAccessor photoAccessor, IUserAccessor userAccessor, IMapper mapper)
             {
                 _userAccessor = userAccessor;
                 _photoAccessor = photoAccessor;
                 _context = context;
+                _mapper = mapper;
             }
 
             // Upload the photo
-            public async Task<Result<Photo>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<PhotoDTO>> Handle(Command request, CancellationToken cancellationToken)
             {
                 // Current logged in user by email
                 var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Email == _userAccessor.GetEmail());
@@ -64,8 +68,8 @@ namespace Application.Photos
 
                 var result = await _context.SaveChangesAsync() > 0;
 
-                if (result) return Result<Photo>.Success(photo);
-                return Result<Photo>.Failure("Problem adding photo");
+                if (result) return Result<PhotoDTO>.Success(_mapper.Map<PhotoDTO>(photo));
+                return Result<PhotoDTO>.Failure("Problem adding photo");
             }
         }
     }

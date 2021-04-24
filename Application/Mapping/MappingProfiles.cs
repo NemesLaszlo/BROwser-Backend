@@ -1,4 +1,5 @@
-﻿using Application.WorkoutEvents.DTOs;
+﻿using Application.Photos.DTOs;
+using Application.WorkoutEvents.DTOs;
 using AutoMapper;
 using Model;
 using System;
@@ -20,6 +21,10 @@ namespace Application.Mapping
             CreateMap<WorkoutEvent, WorkoutEvent>();
 
             CreateMap<WorkoutEvent, WorkoutEventDTO>();
+
+            CreateMap<Photo, PhotoDTO>()
+                .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.AppUser.DisplayName))
+                .ForMember(d => d.MainImage, o => o.MapFrom(s => s.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url));
         }
     }
 }
