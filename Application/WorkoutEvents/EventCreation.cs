@@ -1,7 +1,9 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Database;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Model;
 using System;
 using System.Collections.Generic;
@@ -42,15 +44,30 @@ namespace Application.WorkoutEvents
         public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly DataContext _context;
+            private readonly IUserAccessor _userAccessor;
 
-            public Handler(DataContext context)
+            public Handler(DataContext context, IUserAccessor userAccessor)
             {
                 _context = context;
+                _userAccessor = userAccessor;
             }
 
             // Create a new WorkoutEvent
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
+                // Current logged in user by email
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == _userAccessor.GetEmail());
+
+                // Creator == Host of this WorkoutEvent
+                var attendee = new WorkoutEventAttendee
+                {
+                    AppUser = user,
+                    WorkoutEvent = request.WorkoutEvent,
+                    IsHost = true
+                };
+
+                request.WorkoutEvent.Attendees.Add(attendee);
+
                 _context.WorkoutEvents.Add(request.WorkoutEvent);
                 var result = await _context.SaveChangesAsync() > 0;
 

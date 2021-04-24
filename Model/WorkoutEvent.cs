@@ -24,5 +24,6 @@ namespace Model
         public string City { get; set; }
         public string Place { get; set; }
         public bool IsCancelled { get; set; }
+        public ICollection<WorkoutEventAttendee> Attendees { get; set; } = new List<WorkoutEventAttendee>();
     }
 }

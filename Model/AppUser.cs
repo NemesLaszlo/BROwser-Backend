@@ -16,6 +16,7 @@ namespace Model
         public string DisplayName { get; set; }
         public string Bio { get; set; }
         public ICollection<Photo> Photos { get; set; }
+        public ICollection<WorkoutEventAttendee> WorkoutEvents { get; set; }
         public ICollection<AppUserRole> UserRoles { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }

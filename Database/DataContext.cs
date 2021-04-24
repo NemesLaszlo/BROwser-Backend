@@ -20,6 +20,7 @@ namespace Database
         
         // Entities
         public DbSet<WorkoutEvent> WorkoutEvents { get; set; }
+        public DbSet<WorkoutEventAttendee> WorkoutEventAttendees { get; set; }
         public DbSet<Photo> Photos { get; set; }
 
         // Entitiy realtion settings
@@ -39,6 +40,20 @@ namespace Database
                 .WithOne(u => u.Role)
                 .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
+
+            // Many-to-many AppUser <-> WorkoutEvent
+            builder.Entity<WorkoutEventAttendee>(x => x.HasKey(we => new { we.AppUserId, we.WorkoutEventId }));
+
+            builder.Entity<WorkoutEventAttendee>()
+                .HasOne(u => u.AppUser)
+                .WithMany(e => e.WorkoutEvents)
+                .HasForeignKey(wa => wa.AppUserId);
+
+            builder.Entity<WorkoutEventAttendee>()
+                .HasOne(u => u.WorkoutEvent)
+                .WithMany(e => e.Attendees)
+                .HasForeignKey(wa => wa.WorkoutEventId);
+
         }
     }
 }

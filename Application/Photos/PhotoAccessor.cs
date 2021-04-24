@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Application.Photos
 {
     /// <summary>
-    /// Implementation of the phoro functions
+    /// Implementation of the photo functions
     /// </summary>
     public class PhotoAccessor : IPhotoAccessor
     {
