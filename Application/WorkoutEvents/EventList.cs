@@ -1,4 +1,5 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Application.Paging;
 using Application.WorkoutEvents.DTOs;
 using AutoMapper;
@@ -34,11 +35,13 @@ namespace Application.WorkoutEvents
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
+            private readonly IUserAccessor _userAccessor;
 
-            public Handler(DataContext context, IMapper mapper)
+            public Handler(DataContext context, IMapper mapper, IUserAccessor userAccessor)
             {
                 _context = context;
                 _mapper = mapper;
+                _userAccessor = userAccessor;
             }
 
             // Listing logic with parameter options and pagination
@@ -49,6 +52,18 @@ namespace Application.WorkoutEvents
                     .OrderBy(d => d.Date)
                     .ProjectTo<WorkoutEventDTO>(_mapper.ConfigurationProvider)
                     .AsQueryable();
+
+                // Logged in user going to this events
+                if (request.Parameters.IsGoing && !request.Parameters.IsHost)
+                {
+                    query = query.Where(x => x.Attendees.Any(a => a.Email == _userAccessor.GetEmail()));
+                }
+
+                // Logged in user hosting this events
+                if (request.Parameters.IsHost && !request.Parameters.IsGoing)
+                {
+                    query = query.Where(x => x.HostUsername == _userAccessor.GetUsername());
+                }
 
                 return Result<PagedList<WorkoutEventDTO>>.Success(await PagedList<WorkoutEventDTO>.CreateAsync(query, request.Parameters.PageNumber, request.Parameters.PageSize));
             }

@@ -24,10 +24,19 @@ namespace Application.CurrentUserAccessor
         /// <summary>
         /// Get the email of the current logged in user
         /// </summary>
-        /// <returns>Name of the logged in user</returns>
+        /// <returns>Email of the logged in user</returns>
         public string GetEmail()
         {
             return _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+        }
+
+        /// <summary>
+        /// Get the username of the current logged in user
+        /// </summary>
+        /// <returns>Name of the logged in user</returns>
+        public string GetUsername()
+        {
+            return _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
         }
     }
 }
