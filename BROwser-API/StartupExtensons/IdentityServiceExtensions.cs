@@ -1,5 +1,7 @@
-﻿using Database;
+﻿using BROwser_API.CustomAuthorizationRequirement;
+using Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,7 +64,12 @@ namespace BROwser_API.StartupExtensons
             {
                 opt.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin")); // Admin only
                 opt.AddPolicy("RequireModeratorRole", policy => policy.RequireRole("Admin", "Moderator")); // Admin or Moderator
+                opt.AddPolicy("IsWorkoutEventHostOrAdmin", policy =>
+                {
+                    policy.Requirements.Add(new IsHostOrAdminRequirement());
+                }); // WokroutEvent - Host or Admin
             });
+            services.AddTransient<IAuthorizationHandler, IsHostOrAdminRequirementHandler>();
 
             return services;
         }

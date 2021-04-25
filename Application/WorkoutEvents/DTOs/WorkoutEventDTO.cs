@@ -16,5 +16,7 @@ namespace Application.WorkoutEvents.DTOs
         public string City { get; set; }
         public string Place { get; set; }
         public bool IsCancelled { get; set; }
+        public string HostUsername { get; set; }
+        public ICollection<AttendeeDTO> Attendees { get; set; }
     }
 }

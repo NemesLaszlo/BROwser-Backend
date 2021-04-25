@@ -1,4 +1,5 @@
 ﻿using Application.WorkoutEvents;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using System;
@@ -48,10 +49,12 @@ namespace BROwser_API.Controllers
 
         /// <summary>
         /// Update / Modify an existing WorkoutEvent
+        /// Access: Only the host of the activity or Admin
         /// </summary>
         /// <param name="id"></param>
         /// <param name="workoutEvent">Event values for the modification from the body</param>
         /// <returns>Response handler result</returns>
+        [Authorize(Policy = "IsWorkoutEventHostOrAdmin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> ModifyWorkoutEvent(Guid id, [FromBody] WorkoutEvent workoutEvent)
         {
@@ -61,13 +64,27 @@ namespace BROwser_API.Controllers
 
         /// <summary>
         /// Delete an existing WorkoutEvent by Id
+        /// Access: Only the host of the activity or Admin
         /// </summary>
         /// <param name="id">Id of the selected event to delete</param>
         /// <returns>Response handler result</returns>
+        [Authorize(Policy = "IsWorkoutEventHostOrAdmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWorkoutEvent(Guid id)
         {
             return HandleResult(await Mediator.Send(new EventDelete.Command { WorkoutEvent_Id = id }));
+        }
+
+        /// <summary>
+        /// Subscribe or Unsubscribe from a WorkoutEvent
+        /// As a host you can cancel it or restart it
+        /// </summary>
+        /// <param name="id">Id of the selected event</param>
+        /// <returns></returns>
+        [HttpPost("{id}/attend")]
+        public async Task<IActionResult> Attend(Guid id)
+        {
+            return HandleResult(await Mediator.Send(new EventAttendanceUpdate.Command { WorkoutEvent_Id = id }));
         }
     }
 }

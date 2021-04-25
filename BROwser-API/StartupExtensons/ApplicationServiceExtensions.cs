@@ -1,4 +1,7 @@
-﻿using Application.Mapping;
+﻿using Application.CurrentUserAccessor;
+using Application.Interfaces;
+using Application.Mapping;
+using Application.Photos;
 using Application.WorkoutEvents;
 using BROwser_API.Interfaces;
 using BROwser_API.Services;
@@ -35,8 +38,11 @@ namespace BROwser_API.StartupExtensons
             // Services
             services.AddMediatR(typeof(EventList.Handler).Assembly);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+            services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
 
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.AddScoped<IUserAccessor, UserAccessor>();
 
             services.AddSwaggerGen(c =>
             {

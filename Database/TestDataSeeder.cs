@@ -90,6 +90,14 @@ namespace Database
                     Category = "Hardcore Workout",
                     City = "Miskolc",
                     Place = "Cutler Fitness",
+                    Attendees = new List<WorkoutEventAttendee>
+                    {
+                        new WorkoutEventAttendee
+                        {
+                            AppUser = users[0],
+                            IsHost = true
+                        }
+                    }
                 },
                 new WorkoutEvent
                 {
@@ -99,6 +107,19 @@ namespace Database
                     Category = "Lazy Workout",
                     City = "Miskolc",
                     Place = "M1 Fitness",
+                    Attendees = new List<WorkoutEventAttendee>
+                    {
+                        new WorkoutEventAttendee
+                        {
+                            AppUser = users[0],
+                            IsHost = true
+                        },
+                        new WorkoutEventAttendee
+                        {
+                                AppUser = users[1],
+                                IsHost = false
+                        },
+                    }
                 },
                 new WorkoutEvent
                 {
@@ -108,6 +129,19 @@ namespace Database
                     Category = "Biceps Hardcore",
                     City = "Miskolc",
                     Place = "Cutler Fitness",
+                    Attendees = new List<WorkoutEventAttendee>
+                    {
+                        new WorkoutEventAttendee
+                        {
+                            AppUser = users[2],
+                            IsHost = true
+                        },
+                        new WorkoutEventAttendee
+                        {
+                            AppUser = users[1],
+                            IsHost = false
+                        },
+                    }
                 },
                 new WorkoutEvent
                 {
@@ -117,6 +151,19 @@ namespace Database
                     Category = "Legs Hardcore",
                     City = "Miskolc",
                     Place = "Cutler Fitness",
+                    Attendees = new List<WorkoutEventAttendee>
+                    {
+                        new WorkoutEventAttendee
+                        {
+                            AppUser = users[0],
+                            IsHost = true
+                        },
+                        new WorkoutEventAttendee
+                        {
+                            AppUser = users[2],
+                            IsHost = false
+                        },
+                    }
                 },
                 new WorkoutEvent
                 {
@@ -126,6 +173,19 @@ namespace Database
                     Category = "Chest Workout",
                     City = "Miskolc",
                     Place = "Cutler Fitness",
+                    Attendees = new List<WorkoutEventAttendee>
+                    {
+                        new WorkoutEventAttendee
+                        {
+                            AppUser = users[1],
+                            IsHost = true
+                        },
+                        new WorkoutEventAttendee
+                        {
+                            AppUser = users[0],
+                            IsHost = false
+                        },
+                    }
                 },
             };
 
