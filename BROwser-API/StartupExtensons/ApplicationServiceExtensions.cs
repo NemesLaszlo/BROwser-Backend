@@ -32,8 +32,13 @@ namespace BROwser_API.StartupExtensons
         /// <returns>Services</returns>
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // Database connection
-            services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            // Database connections
+
+            // MS SQL Connection
+            //services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+            // PostgreSQL Connection
+            services.AddDbContext<DataContext>(options => options.UseNpgsql(configuration.GetConnectionString("PostgresqlConnection"))); 
 
             // Services
             services.AddMediatR(typeof(EventList.Handler).Assembly);

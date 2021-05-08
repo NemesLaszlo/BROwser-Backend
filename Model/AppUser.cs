@@ -15,6 +15,8 @@ namespace Model
         public DateTime DateOfBirth { get; set; }
         public string DisplayName { get; set; }
         public string Bio { get; set; }
+        public DateTime Created { get; set; } = DateTime.Now;
+        public DateTime LastActive { get; set; } = DateTime.Now;
         public ICollection<Photo> Photos { get; set; }
         public ICollection<WorkoutEventAttendee> WorkoutEvents { get; set; }
         public ICollection<AppUserRole> UserRoles { get; set; }

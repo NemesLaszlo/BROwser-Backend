@@ -17,8 +17,9 @@ namespace Database
     public class DataContext : IdentityDbContext<AppUser, AppRole, Guid, IdentityUserClaim<Guid>, AppUserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         public DataContext(DbContextOptions options) : base(options) { }
-        
+
         // Entities
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<WorkoutEvent> WorkoutEvents { get; set; }
         public DbSet<WorkoutEventAttendee> WorkoutEventAttendees { get; set; }
         public DbSet<Photo> Photos { get; set; }
