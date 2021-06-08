@@ -1,4 +1,6 @@
-﻿using Application.Photos.DTOs;
+﻿using Application.Core;
+using Application.Photos.DTOs;
+using Application.UserProfile.DTOs;
 using Application.WorkoutEvents.DTOs;
 using AutoMapper;
 using Model;
@@ -33,6 +35,10 @@ namespace Application.Mapping
             CreateMap<Photo, PhotoDTO>()
                 .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.AppUser.DisplayName))
                 .ForMember(d => d.MainImage, o => o.MapFrom(s => s.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url));
+
+            CreateMap<AppUser, ProfileDTO>()
+                .ForMember(d => d.Age, o => o.MapFrom(s => s.DateOfBirth.CalculateAge()))
+                .ForMember(d => d.Image, o => o.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain).Url));
         }
     }
 }
