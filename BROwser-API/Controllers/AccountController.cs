@@ -168,7 +168,6 @@ namespace BROwser_API.Controllers
         public async Task<ActionResult<UserDTO>> GetCurrentUser()
         {
             var user = await _userManager.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Email == User.FindFirstValue(ClaimTypes.Email));
-            await SetRefreshToken(user);
             return await CreateUserObjectAsync(user);
         }
 

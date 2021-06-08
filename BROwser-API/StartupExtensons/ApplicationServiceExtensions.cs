@@ -44,6 +44,7 @@ namespace BROwser_API.StartupExtensons
             services.AddMediatR(typeof(EventList.Handler).Assembly);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
+            services.AddScoped<UserActivityLogger>();
 
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
