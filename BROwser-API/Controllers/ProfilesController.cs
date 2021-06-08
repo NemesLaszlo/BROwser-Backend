@@ -1,4 +1,5 @@
 ﻿using Application.UserProfile;
+using Application.UserProfile.Parameters;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,17 @@ namespace BROwser_API.Controllers
         public async Task<IActionResult> Edit(ProfileEdit.Command command)
         {
             return HandleResult(await Mediator.Send(command));
+        }
+
+        /// <summary>
+        /// Get the selected user's events with filter parameters like future / hosing / past.
+        /// </summary>
+        /// <param name="pagingParameter">Query parameters for the listing</param>
+        /// <returns>Pagination handler response</returns>
+        [HttpGet("{username}/events")]
+        public async Task<IActionResult> GetUserEvents(string username, [FromQuery] ProfileEventsParameters pagingParameter)
+        {
+            return HandlePageinatedResult(await Mediator.Send(new ProfileListEvents.Query { Username = username, Parameters = pagingParameter }));
         }
     }
 }
