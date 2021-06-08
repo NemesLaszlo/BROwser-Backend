@@ -30,6 +30,9 @@ namespace Application.UserProfile
             public ProfileEventsParameters Parameters { get; set; }
         }
 
+        /// <summary>
+        /// Listing user's workoutEvents - business operation handler
+        /// </summary>
         public class Handler : IRequestHandler<Query, Result<PagedList<UserEventDTO>>>
         {
             private readonly DataContext _context;

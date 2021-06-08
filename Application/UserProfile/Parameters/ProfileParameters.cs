@@ -14,7 +14,6 @@ namespace Application.UserProfile.Parameters
     /// </summary>
     public class ProfileParameters : PagingParameters
     {
-        public string CurrentUsername { get; set; }
         public int MinAge { get; set; } = 13;
         public int MaxAge { get; set; } = 110;
         public string OrderBy { get; set; } = "lastActive";

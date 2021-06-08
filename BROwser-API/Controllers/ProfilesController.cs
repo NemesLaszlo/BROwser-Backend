@@ -33,7 +33,7 @@ namespace BROwser_API.Controllers
         }
 
         /// <summary>
-        /// Get the selected user's events with filter parameters like future / hosing / past.
+        /// Get the selected user's events with filter parameters like future (default) / hosing / past.
         /// </summary>
         /// <param name="pagingParameter">Query parameters for the listing</param>
         /// <returns>Pagination handler response</returns>
@@ -41,6 +41,18 @@ namespace BROwser_API.Controllers
         public async Task<IActionResult> GetUserEvents(string username, [FromQuery] ProfileEventsParameters pagingParameter)
         {
             return HandlePageinatedResult(await Mediator.Send(new ProfileListEvents.Query { Username = username, Parameters = pagingParameter }));
+        }
+
+        /// <summary>
+        /// Get the list of the Profiles except the current user with filtering options
+        /// like age intervals and orderby (created date / lastactive)
+        /// </summary>
+        /// <param name="pagingParameter">Query parameters for the listing</param>
+        /// <returns>Pagination handler response</returns>
+        [HttpGet]
+        public async Task<IActionResult> GetProfiles([FromQuery] ProfileParameters pagingParameter)
+        {
+            return HandlePageinatedResult(await Mediator.Send(new ProfileList.Query {Parameters = pagingParameter }));
         }
     }
 }
