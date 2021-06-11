@@ -15,6 +15,9 @@ namespace Application.UserProfile.DTOs
         public int Age { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastActive { get; set; }
+        public bool Following { get; set; } // Current logged in user following this profile or not
+        public int FollowersCount { get; set; }
+        public int FollowingCount { get; set; }
         public string Bio { get; set; }
         public string Image { get; set; }
         public ICollection<PhotoDTO> Photos { get; set; }

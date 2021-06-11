@@ -26,6 +26,7 @@ namespace Database
         public DbSet<WorkoutEvent> WorkoutEvents { get; set; }
         public DbSet<WorkoutEventAttendee> WorkoutEventAttendees { get; set; }
         public DbSet<Photo> Photos { get; set; }
+        public DbSet<UserFollowing> UserFollowings { get; set; }
 
         // Entitiy realtion settings
         protected override void OnModelCreating(ModelBuilder builder)
@@ -57,6 +58,23 @@ namespace Database
                 .HasOne(u => u.WorkoutEvent)
                 .WithMany(e => e.Attendees)
                 .HasForeignKey(wa => wa.WorkoutEventId);
+
+            // Many-to-many "self relationships" -> Following system
+            builder.Entity<UserFollowing>(b => 
+            {
+                b.HasKey(k => new { k.ObserverId, k.TargetId });
+
+                b.HasOne(o => o.Observer)
+                    .WithMany(f => f.Followings)
+                    .HasForeignKey(o => o.ObserverId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(t => t.Target)
+                    .WithMany(f => f.Followers)
+                    .HasForeignKey(o => o.TargetId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            
+            });
 
             builder.ApplyUtcDateTimeConverter();
         }

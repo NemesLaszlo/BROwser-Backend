@@ -20,6 +20,8 @@ namespace Application.Mapping
         // Mapping configurations
         public MappingProfiles()
         {
+            string currentUsername = null; // Current logged in user following this profile or not
+
             CreateMap<WorkoutEvent, WorkoutEvent>();
 
             CreateMap<WorkoutEvent, WorkoutEventDTO>()
@@ -38,7 +40,10 @@ namespace Application.Mapping
 
             CreateMap<AppUser, ProfileDTO>()
                 .ForMember(d => d.Age, o => o.MapFrom(s => s.DateOfBirth.CalculateAge()))
-                .ForMember(d => d.Image, o => o.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain).Url));
+                .ForMember(d => d.Image, o => o.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain).Url))
+                .ForMember(d => d.Following, o => o.MapFrom(s => s.Followers.Any(x => x.Observer.UserName == currentUsername)))
+                .ForMember(d => d.FollowersCount, o => o.MapFrom(s => s.Followers.Count))
+                .ForMember(d => d.FollowingCount, o => o.MapFrom(s => s.Followings.Count));
 
             CreateMap<WorkoutEventAttendee, UserEventDTO>()
                 .ForMember(d => d.Event_Id, o => o.MapFrom(s => s.WorkoutEvent.WorkoutEvent_Id))
