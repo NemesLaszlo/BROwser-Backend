@@ -1,4 +1,5 @@
 ﻿using Application.Core;
+using Application.CurrentUserAccessor;
 using Application.Paging;
 using BROwser_API.Headers;
 using MediatR;
@@ -15,6 +16,7 @@ namespace BROwser_API.Controllers
     /// <summary>
     /// Base / Source controller with Mediator configuration and Endpoint result handling
     /// </summary>
+    [ServiceFilter(typeof(UserActivityLogger))] // any action activates this action-filter handle the lastactivity
     [Route("api/[controller]")]
     [ApiController]
     public class BaseApiController : ControllerBase
