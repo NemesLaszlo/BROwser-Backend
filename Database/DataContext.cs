@@ -27,6 +27,7 @@ namespace Database
         public DbSet<WorkoutEventAttendee> WorkoutEventAttendees { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<UserFollowing> UserFollowings { get; set; }
+        public DbSet<UserLike> UserLikes { get; set; }
 
         // Entitiy realtion settings
         protected override void OnModelCreating(ModelBuilder builder)
@@ -74,6 +75,23 @@ namespace Database
                     .HasForeignKey(o => o.TargetId)
                     .OnDelete(DeleteBehavior.Cascade);
             
+            });
+
+            // Many-to-many "self relationships" -> Like system
+            builder.Entity<UserLike>(b =>
+            {
+                b.HasKey(k => new { k.SourceUserId, k.LikedUserId });
+
+                b.HasOne(s => s.SourceUser)
+                    .WithMany(u => u.LikedUsers)
+                    .HasForeignKey(s => s.SourceUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(l => l.LikedUser)
+                    .WithMany(u => u.LikedByUsers)
+                    .HasForeignKey(l => l.LikedUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
             });
 
             builder.ApplyUtcDateTimeConverter();

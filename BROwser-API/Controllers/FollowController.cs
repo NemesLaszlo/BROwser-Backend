@@ -30,7 +30,7 @@ namespace BROwser_API.Controllers
         [HttpGet("{username}")]
         public async Task<IActionResult> GetFollowings(string username, [FromQuery] FollowingParameters parameters)
         {
-            return HandleResult(await Mediator.Send(new FollowingList.Query { Username = username, Parameters = parameters }));
+            return HandlePageinatedResult(await Mediator.Send(new FollowingList.Query { Username = username, Parameters = parameters }));
         }
     }
 }

@@ -10,15 +10,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application.UserFollowing
+namespace Application.UserLike
 {
     /// <summary>
-    /// Follow or Unfollow a profile
+    /// Like or UnLike (remove the like) a profile
     /// </summary>
-    public class FollowToggle
+    public class LikeToggle
     {
         /// <summary>
-        /// Username of the user to follow or unfollow him/her
+        /// Username of the user to like or unlike him/her
         /// </summary>
         public class Command : IRequest<Result<Unit>>
         {
@@ -26,7 +26,7 @@ namespace Application.UserFollowing
         }
 
         /// <summary>
-        /// Follow / Unfollow - business operation handler
+        /// Like / UnLike - business operation handler
         /// </summary>
         public class Handler : IRequestHandler<Command, Result<Unit>>
         {
@@ -39,40 +39,40 @@ namespace Application.UserFollowing
                 _context = context;
             }
 
-            // Follow or unfollow the selected user
+            // Like or UnLike the selected user
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 // Logged in user
-                var observer = await _context.Users.FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername());
+                var sourceUser = await _context.Users.FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername());
 
-                var target = await _context.Users.FirstOrDefaultAsync(x => x.UserName == request.TargetUsername);
-                if (target == null) return null;
+                var likedUser = await _context.Users.FirstOrDefaultAsync(x => x.UserName == request.TargetUsername);
+                if (likedUser == null) return null;
 
-                // Cannot follow yourself
-                if (observer.UserName == request.TargetUsername) return null;
+                // Cannot like yourself
+                if (sourceUser.UserName == request.TargetUsername) return null;
 
-                var following = await _context.UserFollowings.FindAsync(observer.Id, target.Id);
+                var userLike = await _context.UserLikes.FindAsync(sourceUser.Id, likedUser.Id);
 
-                //  If there is no a following record -> follow otherwise unfollow
-                if (following == null)
+                // Like or unlike this user
+                if (userLike == null)
                 {
-                    following = new Model.UserFollowing
+                    userLike = new Model.UserLike
                     {
-                        Observer = observer,
-                        Target = target
+                        SourceUser = sourceUser,
+                        LikedUser = likedUser
                     };
 
-                    _context.UserFollowings.Add(following);
+                    _context.UserLikes.Add(userLike);
                 }
                 else
                 {
-                    _context.UserFollowings.Remove(following);
+                    _context.UserLikes.Remove(userLike);
                 }
 
                 var success = await _context.SaveChangesAsync() > 0;
 
                 if (success) return Result<Unit>.Success(Unit.Value);
-                return Result<Unit>.Failure("Failed to update following");
+                return Result<Unit>.Failure("Failed to update like");
             }
         }
     }

@@ -43,7 +43,10 @@ namespace Application.Mapping
                 .ForMember(d => d.Image, o => o.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain).Url))
                 .ForMember(d => d.Following, o => o.MapFrom(s => s.Followers.Any(x => x.Observer.UserName == currentUsername)))
                 .ForMember(d => d.FollowersCount, o => o.MapFrom(s => s.Followers.Count))
-                .ForMember(d => d.FollowingCount, o => o.MapFrom(s => s.Followings.Count));
+                .ForMember(d => d.FollowingCount, o => o.MapFrom(s => s.Followings.Count))
+                .ForMember(d => d.Like, o => o.MapFrom(s => s.LikedByUsers.Any(x => x.SourceUser.UserName == currentUsername)))
+                .ForMember(d => d.LikedByCount, o => o.MapFrom(s => s.LikedByUsers.Count))
+                .ForMember(d => d.LikedCount, o => o.MapFrom(s => s.LikedUsers.Count));
 
             CreateMap<WorkoutEventAttendee, UserEventDTO>()
                 .ForMember(d => d.Event_Id, o => o.MapFrom(s => s.WorkoutEvent.WorkoutEvent_Id))

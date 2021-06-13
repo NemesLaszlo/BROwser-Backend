@@ -18,14 +18,14 @@ using System.Threading.Tasks;
 namespace Application.UserFollowing
 {
     /// <summary>
-    /// List the selected user followings or followers
+    /// List the selected user followings or followers with pagination
     /// </summary>
     public class FollowingList
     {
         /// <summary>
         /// List the user followings or followers with the help of the 'parameters'
         /// </summary>
-        public class Query : IRequest<Result<List<ProfileDTO>>>
+        public class Query : IRequest<Result<PagedList<ProfileDTO>>>
         {
             public string Username { get; set; }
             public FollowingParameters Parameters { get; set; }
@@ -34,7 +34,7 @@ namespace Application.UserFollowing
         /// <summary>
         /// Selected user followings or followers - business operation handler
         /// </summary>
-        public class Handler : IRequestHandler<Query, Result<List<ProfileDTO>>>
+        public class Handler : IRequestHandler<Query, Result<PagedList<ProfileDTO>>>
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
@@ -47,28 +47,32 @@ namespace Application.UserFollowing
                 _userAccessor = userAccessor;
             }
 
-            // Listing operation followings or followers
-            public async Task<Result<List<ProfileDTO>>> Handle(Query request, CancellationToken cancellationToken)
+            // Listing operation followings or followers with pagination
+            public async Task<Result<PagedList<ProfileDTO>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var profiles = new List<ProfileDTO>();
+                var profiles = _context.Users
+                    .OrderBy(u => u.UserName)
+                    .AsQueryable();
+
+                var followers = _context.UserFollowings
+                    .OrderBy(u => u.Observer)
+                    .AsQueryable();
 
                 switch (request.Parameters.Predicate)
                 {
                     case "followers":
-                        profiles = await _context.UserFollowings.Where(x => x.Target.UserName == request.Username)
-                            .Select(u => u.Observer)
-                            .ProjectTo<ProfileDTO>(_mapper.ConfigurationProvider, new { currentUsername = _userAccessor.GetUsername() })
-                            .ToListAsync();
+                        followers = followers.Where(x => x.Target.UserName == request.Username);
+                        profiles = followers.Select(u => u.Observer);                           
                         break;
                     case "following":
-                        profiles = await _context.UserFollowings.Where(x => x.Observer.UserName == request.Username)
-                            .Select(u => u.Target)
-                            .ProjectTo<ProfileDTO>(_mapper.ConfigurationProvider, new { currentUsername = _userAccessor.GetUsername() })
-                            .ToListAsync();
+                        followers = followers.Where(x => x.Observer.UserName == request.Username);
+                        profiles = followers.Select(u => u.Target);
                         break;
                 }
 
-                return Result<List<ProfileDTO>>.Success(profiles);
+                var resultProfiles = profiles.ProjectTo<ProfileDTO>(_mapper.ConfigurationProvider, new { currentUsername = _userAccessor.GetUsername() });
+
+                return Result<PagedList<ProfileDTO>>.Success(await PagedList<ProfileDTO>.CreateAsync(resultProfiles, request.Parameters.PageNumber, request.Parameters.PageSize));
             }
         }
     }
