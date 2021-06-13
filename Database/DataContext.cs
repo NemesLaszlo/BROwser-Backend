@@ -26,6 +26,8 @@ namespace Database
         public DbSet<WorkoutEvent> WorkoutEvents { get; set; }
         public DbSet<WorkoutEventAttendee> WorkoutEventAttendees { get; set; }
         public DbSet<Photo> Photos { get; set; }
+        public DbSet<UserFollowing> UserFollowings { get; set; }
+        public DbSet<UserLike> UserLikes { get; set; }
 
         // Entitiy realtion settings
         protected override void OnModelCreating(ModelBuilder builder)
@@ -57,6 +59,40 @@ namespace Database
                 .HasOne(u => u.WorkoutEvent)
                 .WithMany(e => e.Attendees)
                 .HasForeignKey(wa => wa.WorkoutEventId);
+
+            // Many-to-many "self relationships" -> Following system
+            builder.Entity<UserFollowing>(b => 
+            {
+                b.HasKey(k => new { k.ObserverId, k.TargetId });
+
+                b.HasOne(o => o.Observer)
+                    .WithMany(f => f.Followings)
+                    .HasForeignKey(o => o.ObserverId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(t => t.Target)
+                    .WithMany(f => f.Followers)
+                    .HasForeignKey(o => o.TargetId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            
+            });
+
+            // Many-to-many "self relationships" -> Like system
+            builder.Entity<UserLike>(b =>
+            {
+                b.HasKey(k => new { k.SourceUserId, k.LikedUserId });
+
+                b.HasOne(s => s.SourceUser)
+                    .WithMany(u => u.LikedUsers)
+                    .HasForeignKey(s => s.SourceUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(l => l.LikedUser)
+                    .WithMany(u => u.LikedByUsers)
+                    .HasForeignKey(l => l.LikedUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            });
 
             builder.ApplyUtcDateTimeConverter();
         }
