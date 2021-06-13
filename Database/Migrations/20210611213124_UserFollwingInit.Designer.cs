@@ -3,15 +3,17 @@ using System;
 using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20210611213124_UserFollwingInit")]
+    partial class UserFollwingInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -289,21 +291,6 @@ namespace Database.Migrations
                     b.ToTable("UserFollowings");
                 });
 
-            modelBuilder.Entity("Model.UserLike", b =>
-                {
-                    b.Property<Guid>("SourceUserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("LikedUserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("SourceUserId", "LikedUserId");
-
-                    b.HasIndex("LikedUserId");
-
-                    b.ToTable("UserLikes");
-                });
-
             modelBuilder.Entity("Model.WorkoutEvent", b =>
                 {
                     b.Property<Guid>("WorkoutEvent_Id")
@@ -452,25 +439,6 @@ namespace Database.Migrations
                     b.Navigation("Target");
                 });
 
-            modelBuilder.Entity("Model.UserLike", b =>
-                {
-                    b.HasOne("Model.AppUser", "LikedUser")
-                        .WithMany("LikedByUsers")
-                        .HasForeignKey("LikedUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Model.AppUser", "SourceUser")
-                        .WithMany("LikedUsers")
-                        .HasForeignKey("SourceUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LikedUser");
-
-                    b.Navigation("SourceUser");
-                });
-
             modelBuilder.Entity("Model.WorkoutEventAttendee", b =>
                 {
                     b.HasOne("Model.AppUser", "AppUser")
@@ -500,10 +468,6 @@ namespace Database.Migrations
                     b.Navigation("Followers");
 
                     b.Navigation("Followings");
-
-                    b.Navigation("LikedByUsers");
-
-                    b.Navigation("LikedUsers");
 
                     b.Navigation("Photos");
 

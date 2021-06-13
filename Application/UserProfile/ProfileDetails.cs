@@ -48,7 +48,7 @@ namespace Application.UserProfile
             public async Task<Result<ProfileDTO>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _context.Users
-                    .ProjectTo<ProfileDTO>(_mapper.ConfigurationProvider)
+                    .ProjectTo<ProfileDTO>(_mapper.ConfigurationProvider, new { currentUsername = _userAccessor.GetUsername() })
                     .SingleOrDefaultAsync(u => u.Username == request.Username);
 
                 return Result<ProfileDTO>.Success(user);
