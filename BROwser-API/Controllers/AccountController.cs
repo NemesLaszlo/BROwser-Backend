@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Model;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
@@ -97,11 +96,11 @@ namespace BROwser_API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDto)
         {
-            if (!IsValidEmailAddress(loginDto.Email)) return Unauthorized("Invalid Email Form");
+            if (!IsValidEmailAddress(loginDto.Email)) return Unauthorized(new MessageDTO { Message = "Invalid Email Form"});
 
             var user = await _userManager.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Email == loginDto.Email);
 
-            if (user == null) return Unauthorized("Invalid Email");
+            if (user == null) return Unauthorized(new MessageDTO { Message = "Invalid Email" });
 
             var result = await _singInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
@@ -111,7 +110,7 @@ namespace BROwser_API.Controllers
                 return await CreateUserObjectAsync(user);
             }
 
-            return Unauthorized("Invalid password");
+            return Unauthorized(new MessageDTO { Message = "Invalid password" });
         }
 
         /// <summary>
@@ -151,13 +150,13 @@ namespace BROwser_API.Controllers
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
 
-            if (!result.Succeeded) return BadRequest("Problem registering user");
+            if (!result.Succeeded) return BadRequest(result.Errors);
 
             var roleResult = await _userManager.AddToRoleAsync(user, "Member");
 
-            if (!roleResult.Succeeded) return BadRequest(result.Errors);
+            if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
 
-            return Ok("Registration success");
+            return Ok(new MessageDTO { Message = "Registration success" });
         }
 
         /// <summary>
