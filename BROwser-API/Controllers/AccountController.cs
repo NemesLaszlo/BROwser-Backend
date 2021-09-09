@@ -96,21 +96,30 @@ namespace BROwser_API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDto)
         {
-            if (!IsValidEmailAddress(loginDto.Email)) return Unauthorized(new MessageDTO { Message = "Invalid Email Form"});
+            if (!IsValidEmailAddress(loginDto.Email))
+            {
+                ModelState.AddModelError("email", "Invalid Email Form");
+                return ValidationProblem();
+            }
 
             var user = await _userManager.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Email == loginDto.Email);
 
-            if (user == null) return Unauthorized(new MessageDTO { Message = "Invalid Email" });
+            if (user == null)
+            {
+                ModelState.AddModelError("email", "Invalid Email");
+                return ValidationProblem();
+            }
 
             var result = await _singInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                await SetRefreshToken(user);
-                return await CreateUserObjectAsync(user);
+                ModelState.AddModelError("password", "Invalid Password");
+                return ValidationProblem();
             }
 
-            return Unauthorized(new MessageDTO { Message = "Invalid password" });
+            await SetRefreshToken(user);
+            return await CreateUserObjectAsync(user);
         }
 
         /// <summary>
@@ -130,13 +139,13 @@ namespace BROwser_API.Controllers
 
             if (await _userManager.Users.AnyAsync(x => x.Email == registerDto.Email))
             {
-                ModelState.AddModelError("email", "Email taken");
+                ModelState.AddModelError("email", "Email Taken");
                 return ValidationProblem();
             }
 
             if (await _userManager.Users.AnyAsync(x => x.UserName == registerDto.Username))
             {
-                ModelState.AddModelError("username", "Username taken");
+                ModelState.AddModelError("username", "Username Taken");
                 return ValidationProblem();
             }
 
@@ -156,7 +165,7 @@ namespace BROwser_API.Controllers
 
             if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
 
-            return Ok(new MessageDTO { Message = "Registration success" });
+            return Ok();
         }
 
         /// <summary>
