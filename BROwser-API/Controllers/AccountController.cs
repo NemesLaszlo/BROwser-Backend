@@ -1,14 +1,17 @@
-﻿using BROwser_API.DTOs;
+﻿using Application.Email;
+using BROwser_API.DTOs;
 using BROwser_API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Model;
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -23,12 +26,14 @@ namespace BROwser_API.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _singInManager;
         private readonly ITokenService _tokenService;
+        private readonly EmailSender _emailSender;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> singInManager, ITokenService tokenService)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> singInManager, ITokenService tokenService, EmailSender emailSender)
         {
             _userManager = userManager;
             _singInManager = singInManager;
             _tokenService = tokenService;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -110,6 +115,12 @@ namespace BROwser_API.Controllers
                 return ValidationProblem();
             }
 
+            if (!user.EmailConfirmed)
+            {
+                ModelState.AddModelError("email", "Email not confirmed");
+                return ValidationProblem();
+            }
+
             var result = await _singInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             if (!result.Succeeded)
@@ -164,6 +175,117 @@ namespace BROwser_API.Controllers
             var roleResult = await _userManager.AddToRoleAsync(user, "Member");
 
             if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
+
+            // Email verification - email send part
+            var origin = Request.Headers["origin"]; // request comes from
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var verifyUrl = $"{origin}/account/verifyEmail?token={token}&email={user.Email}";
+            var message = $"<p>Please click the below link to verify your email address:</p><p><a href='{verifyUrl}'>Click to verify email</a></p>";
+
+            await _emailSender.SendEmailAsync(user.Email, "Please verify email", message);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Verify email address after registration
+        /// </summary>
+        /// <param name="token">Token for the verification</param>
+        /// <param name="email">Email to verify</param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost("verifyEmail")]
+        public async Task<IActionResult> VerifyEmail(string token, string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return Unauthorized();
+
+            var decodedTokenBytes = WebEncoders.Base64UrlDecode(token);
+            var decodedToken = Encoding.UTF8.GetString(decodedTokenBytes);
+            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("email", "Could not verify email address");
+                return ValidationProblem();
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Resend the verification email
+        /// </summary>
+        /// <param name="email">Email to verify</param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("resendEmailConfirmationLink")]
+        public async Task<IActionResult> ResendEmailConfirmationLink(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return Unauthorized();
+
+            var origin = Request.Headers["origin"]; // request comes from
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var verifyUrl = $"{origin}/account/verifyEmail?token={token}&email={user.Email}";
+            var message = $"<p>Please click the below link to verify your email address:</p><p><a href='{verifyUrl}'>Click to verify email</a></p>";
+
+            await _emailSender.SendEmailAsync(user.Email, "Please verify email", message);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Password reset
+        /// </summary>
+        /// <param name="token">Token for the password reset</param>
+        /// <param name="email">Email to verify user and reset his/him password</param>
+        /// <param name="resetDto">New password</param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost("passwordReset")]
+        public async Task<IActionResult> PasswordReset(string token, string email, PasswordResetDTO resetDto)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return Unauthorized();
+
+            var decodedTokenBytes = WebEncoders.Base64UrlDecode(token);
+            var decodedToken = Encoding.UTF8.GetString(decodedTokenBytes);
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, resetDto.newPassword);
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("password", "Could not reset password");
+                return ValidationProblem();
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Resend password reset email
+        /// </summary>
+        /// <param name="email">Email to reset user password</param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("passwordResetRequest")]
+        public async Task<IActionResult> PasswordResetRequest(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return Unauthorized();
+
+            var origin = Request.Headers["origin"]; // request comes from
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var resetUrl = $"{origin}/account/passwordReset?token={token}&email={user.Email}";
+            var message = $"<p>Please click the below link to reset your password:</p><p><a href='{resetUrl}'>Click to reset password</a></p>";
+
+            await _emailSender.SendEmailAsync(user.Email, "Password reset", message);
 
             return Ok();
         }
