@@ -1,4 +1,5 @@
 ﻿using Application.CurrentUserAccessor;
+using Application.Email;
 using Application.Interfaces;
 using Application.Mapping;
 using Application.Photos;
@@ -76,6 +77,7 @@ namespace BROwser_API.StartupExtensons
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
             services.AddScoped<UserActivityLogger>();
+            services.AddScoped<EmailSender>();
 
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
