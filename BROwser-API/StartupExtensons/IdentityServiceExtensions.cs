@@ -34,6 +34,7 @@ namespace BROwser_API.StartupExtensons
             services.AddIdentityCore<AppUser>(options =>
             {
                 options.Password.RequireNonAlphanumeric = false;
+                options.SignIn.RequireConfirmedEmail = true;
             })
              .AddRoles<AppRole>()
              .AddRoleManager<RoleManager<AppRole>>()

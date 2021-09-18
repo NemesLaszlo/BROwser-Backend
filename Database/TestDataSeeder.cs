@@ -33,35 +33,40 @@ namespace Database
                         DisplayName = "Laci",
                         UserName = "Laszlo",
                         DateOfBirth = new DateTime(1996, 4, 20),
-                        Email = "laszlo@browser.com"
+                        Email = "laszlo@browser.com",
+                        EmailConfirmed = true
                     },
                     new AppUser
                     {
                         DisplayName = "Attila",
                         UserName = "Attila",
                         DateOfBirth = new DateTime(1996, 4, 20),
-                        Email = "attila@browser.com"
+                        Email = "attila@browser.com",
+                        EmailConfirmed = true
                     },
                     new AppUser
                     {
                         DisplayName = "Krisz",
                         UserName = "Krisztian",
                         DateOfBirth = new DateTime(1996, 4, 20),
-                        Email = "krisztian@browser.com"
+                        Email = "krisztian@browser.com",
+                        EmailConfirmed = true
                     },
                     new AppUser
                     {
                         DisplayName = "Karesz",
                         UserName = "Karoly",
                         DateOfBirth = new DateTime(1996, 4, 20),
-                        Email = "karoly@browser.com"
+                        Email = "karoly@browser.com",
+                        EmailConfirmed = true
                     },
                     new AppUser
                     {
                         DisplayName = "Adam",
                         UserName = "Adam",
                         DateOfBirth = new DateTime(1996, 4, 20),
-                        Email = "adam@browser.com"
+                        Email = "adam@browser.com",
+                        EmailConfirmed = true
                     },
             };
 
@@ -75,7 +80,8 @@ namespace Database
             {
                 DisplayName = "Admin",
                 UserName = "admin",
-                Email = "admin@browser.com"
+                Email = "admin@browser.com",
+                EmailConfirmed = true
             };
             await userManager.CreateAsync(admin, "Pa$$w0rd");
             await userManager.AddToRolesAsync(admin, new[] { "Admin", "Moderator" });
