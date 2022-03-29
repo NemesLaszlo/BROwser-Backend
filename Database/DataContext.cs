@@ -68,12 +68,12 @@ namespace Database
                 b.HasOne(o => o.Observer)
                     .WithMany(f => f.Followings)
                     .HasForeignKey(o => o.ObserverId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 b.HasOne(t => t.Target)
                     .WithMany(f => f.Followers)
                     .HasForeignKey(o => o.TargetId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
             
             });
 
@@ -85,12 +85,12 @@ namespace Database
                 b.HasOne(s => s.SourceUser)
                     .WithMany(u => u.LikedUsers)
                     .HasForeignKey(s => s.SourceUserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 b.HasOne(l => l.LikedUser)
                     .WithMany(u => u.LikedByUsers)
                     .HasForeignKey(l => l.LikedUserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
 
             });
 
